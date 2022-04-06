@@ -3,7 +3,7 @@
 Установка golang https://go.dev/doc/install
 Подгрузить модули go mod tidy из корня
 
-##Запуск
+## Запуск
 
 go run src/main.go [dbUser] [dbPswd] [dbName]
   dbUser пользователь БД
