@@ -2,7 +2,7 @@
 
 Установка golang https://go.dev/doc/install
 
-Подгрузить модули go mod tidy из корня
+Подгрузить модули ``` go mod tidy ``` из корня
 
 ## Запуск
 
