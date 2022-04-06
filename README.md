@@ -6,7 +6,7 @@
 
 ## Запуск
 
-go run src/main.go [dbUser] [dbPswd] [dbName]
+``` go run src/main.go [dbUser] [dbPswd] [dbName] ```
 
   dbUser пользователь БД
 
