@@ -2,11 +2,11 @@ package socket
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -52,25 +52,30 @@ func sendPercent(c *websocket.Conn, sendData []PdfGenerator) error {
 
 func sendTimer(c *websocket.Conn, header string) {
 	for now := range time.Tick(time.Second) {
+		wg := &sync.WaitGroup{}
 		for val := range clients[header] {
-			fmt.Println(clients[header][val])
+			wg.Add(1)
 
-			var percent int
+			go func(wg *sync.WaitGroup, val int) {
+				var percent int
 
-			if clients[header][val].Percent == MAX_PERCENT {
-				percent = DONE_PERCENT
-			} else {
-				percent = clients[header][val].Percent + 1
-			}
+				if clients[header][val].Percent == MAX_PERCENT {
+					percent = DONE_PERCENT
+				} else {
+					percent = clients[header][val].Percent + 1
+				}
 
-			clients[header][val] = PdfGenerator{
-				Uuid:    clients[header][val].Uuid,
-				Percent: percent,
-			}
+				clients[header][val] = PdfGenerator{
+					Uuid:    clients[header][val].Uuid,
+					Percent: percent,
+				}
+
+				wg.Done()
+			}(wg, val)
 		}
-		log.Println(now)
-		log.Println(clients[header])
 
+		wg.Wait()
+		log.Println(now)
 		err := sendPercent(c, clients[header])
 
 		if err != nil {
@@ -93,10 +98,6 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 		clients[header] = make([]PdfGenerator, 0, 10)
 	}
 
-	//defer func() {
-	//	delete(clients, header)
-	//}()
-
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
@@ -105,10 +106,7 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 		}
 
 		recievedMsg := &PdfGeneratorDto{}
-
 		json.Unmarshal(message, &recievedMsg)
-
-		fmt.Println(mt)
 
 		if recievedMsg.Type == "startConn" {
 			go sendTimer(c, header)
