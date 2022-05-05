@@ -3,11 +3,9 @@ package db
 import (
 	"awesomeProject/pkg/defaultData"
 	"awesomeProject/pkg/models"
-	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-	"os"
 )
 
 func InsertInto(db *gorm.DB, userId, permId int) {
@@ -15,8 +13,8 @@ func InsertInto(db *gorm.DB, userId, permId int) {
 }
 
 func Init() *gorm.DB {
-	//dbURL := "postgres://postgres:pavel@localhost:5432/nft"
-	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", os.Args[1], os.Args[2], os.Args[3])
+	dbURL := "postgres://postgres:pavel@localhost:5432/nft"
+	//dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", os.Args[1], os.Args[2], os.Args[3])
 
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 

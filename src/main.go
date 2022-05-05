@@ -6,18 +6,18 @@ import (
 	"awesomeProject/pkg/handlers/userHandler"
 	"awesomeProject/pkg/handlers/walletHandler"
 	"awesomeProject/pkg/middleware"
+	"awesomeProject/pkg/socket"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
 
-	if len(os.Args) < 4 {
-		panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
-	}
+	//if len(os.Args) < 4 {
+	//	panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
+	//}
 
 	DB := db.Init()
 
@@ -41,17 +41,21 @@ func main() {
 	router.HandleFunc("/wallet/{id}", walletH.GetUserWallets).Methods(http.MethodGet)
 	router.HandleFunc("/wallet/transactions/{id}", walletH.GetWalletTransactions).Methods(http.MethodGet)
 
+	router.HandleFunc("/ws/start", socket.Echo)
+
 	router.Use(middleware.CheckAuthMiddleware)
 
 	handler := cors.New(cors.Options{
-		AllowedOrigins:       []string{"http://localhost:3000"},
-		AllowedMethods:       []string{"GET", "POST", "PUT", "HEAD", "OPTIONS"},
-		AllowedHeaders:       []string{"X-Requested-With", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Content-Type"},
+		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "UPGRADE"},
+		AllowedHeaders: []string{"X-Requested-With", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Content-Type",
+			"Connection", "Host", "Sec-WebSocket-Key", "Sec-WebSocket-Version", "Sec-WebSocket-Extensions"},
 		MaxAge:               86400,
 		AllowCredentials:     true,
 		OptionsSuccessStatus: 204,
 		Debug:                true,
 	}).Handler(router)
 	log.Println("API is running!")
+
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }

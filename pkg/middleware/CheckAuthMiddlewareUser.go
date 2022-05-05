@@ -13,22 +13,7 @@ func CheckAuthMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if r.URL.String() != "/login" {
-			//c, err := r.Cookie("token")
-			//fmt.Println(c)
-
-			//if err != nil {
-			//	if err == http.ErrNoCookie {
-			//		// If the cookie is not set, return an unauthorized status
-			//		w.WriteHeader(http.StatusUnauthorized)
-			//		return
-			//	}
-			//	// For any other type of error, return a bad request status
-			//	w.WriteHeader(http.StatusBadRequest)
-			//	return
-			//}
-
-			//tknStr := c.Value
+		if !(r.URL.String() == "/login" || strings.Contains(r.URL.String(), "/ws/")) {
 
 			authHeader := r.Header.Get("Authorization")
 			if len(strings.Split(authHeader, " ")) < 2 {
