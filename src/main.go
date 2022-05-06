@@ -11,13 +11,14 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
 
-	//if len(os.Args) < 4 {
-	//	panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
-	//}
+	if len(os.Args) < 4 {
+		panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
+	}
 
 	DB := db.Init()
 
