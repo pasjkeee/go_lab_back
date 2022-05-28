@@ -11,14 +11,13 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
-	"os"
 )
 
 func main() {
 
-	if len(os.Args) < 4 {
-		panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
-	}
+	//if len(os.Args) < 4 {
+	//	panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
+	//}
 
 	DB := db.Init()
 
@@ -29,6 +28,7 @@ func main() {
 
 	router.HandleFunc("/login", loginH.SignIn).Methods(http.MethodPost)
 	router.HandleFunc("/logout", loginH.SignOut).Methods(http.MethodPost)
+	router.HandleFunc("/signup", loginH.SignUp).Methods(http.MethodPost)
 	router.HandleFunc("/ping", loginH.Ping).Methods(http.MethodGet)
 
 	router.HandleFunc("/users", userH.GetAllUsers).Methods(http.MethodGet)

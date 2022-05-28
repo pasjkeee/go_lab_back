@@ -6,6 +6,7 @@ type DBInterfase interface {
 	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
 	Create(value interface{}) (tx *gorm.DB)
 	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
+	Where(value interface{}, conds ...interface{}) (tx *gorm.DB)
 }
 type Wallet struct {
 	gorm.Model

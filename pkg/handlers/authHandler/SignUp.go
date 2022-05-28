@@ -4,11 +4,13 @@ import (
 	"awesomeProject/pkg/models"
 	"awesomeProject/pkg/utils"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"net/http"
 )
 
-func (h authHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+func (h authHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	credentials := &Credentials{}
 
 	err := json.NewDecoder(r.Body).Decode(&credentials)
@@ -20,12 +22,26 @@ func (h authHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Get the expected password from our in memory map
 	user := &models.User{}
-	user.FindUserByLogin(credentials.Login, h.DB)
+	userNotFound := user.IsUserByLogin(credentials.Login, h.DB)
 
-	if len(user.Password) == 0 || utils.CheckPasswordHash(user.Password, credentials.Password) {
-		w.WriteHeader(http.StatusUnauthorized)
+	if userNotFound == nil && errors.Is(userNotFound, gorm.ErrRecordNotFound) {
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
+
+	hashedPass, err := utils.HashPassword(credentials.Password)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var newUser = models.User{
+		Login:    credentials.Login,
+		Password: hashedPass,
+	}
+
+	h.DB.Create(&newUser)
 
 	tokenString, refreshString, err := createToken(credentials.Login, 15)
 	if err != nil {

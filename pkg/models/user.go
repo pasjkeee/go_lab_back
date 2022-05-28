@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -30,4 +32,15 @@ func (user *User) FindUserForWalletId(id int, h DBInterfase) {
 
 func (user *User) FindUserByLogin(login string, h DBInterfase) {
 	h.First(user, User{Login: login})
+}
+
+func (user *User) IsUserByLogin(login string, h DBInterfase) error {
+	//err := h.Where("login = ?", login).First(user, User{Login: login}).Error
+	//return errors.Is(err, gorm.ErrRecordNotFound)
+
+	if err := h.Where("login = ?", login).First(user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

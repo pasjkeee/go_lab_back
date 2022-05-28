@@ -13,7 +13,7 @@ func CheckAuthMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if !(r.URL.String() == "/login" || strings.Contains(r.URL.String(), "/ws/")) {
+		if !(r.URL.String() == "/login" || r.URL.String() == "/signup" || strings.Contains(r.URL.String(), "/ws/")) {
 
 			authHeader := r.Header.Get("Authorization")
 			if len(strings.Split(authHeader, " ")) < 2 {

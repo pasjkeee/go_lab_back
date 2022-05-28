@@ -2,6 +2,7 @@ package defaultData
 
 import (
 	"awesomeProject/pkg/models"
+	"awesomeProject/pkg/utils"
 	"time"
 )
 
@@ -50,23 +51,25 @@ var UserPermissionsGroups = []models.UserPermissionsGroups{
 
 var ids = []int{1, 2, 3, 4}
 
+var pswdHashed, _ = utils.HashPassword("123")
+
 var User = []models.User{
-	{Login: "testLogin1", Password: "testPswd1",
+	{Login: "testLogin1", Password: pswdHashed,
 		ESingnatureId: &ESignature[0], UserAccaunt: &UserAccaunt[0],
 		AuthStatuses: &[]models.AuthStatus{AuthStatus[0]},
 		Wallets:      &[]models.Wallet{Wallet[0]},
 	},
-	{Login: "testLogin2", Password: "testPswd2",
+	{Login: "testLogin2", Password: pswdHashed,
 		ESingnatureId: &ESignature[1], UserAccaunt: &UserAccaunt[1],
 		AuthStatuses: &[]models.AuthStatus{AuthStatus[1]},
 		Wallets:      &[]models.Wallet{Wallet[1]},
 	},
-	{Login: "testLogin3", Password: "testPswd3",
+	{Login: "testLogin3", Password: pswdHashed,
 		ESingnatureId: &ESignature[2], UserAccaunt: &UserAccaunt[2],
 		AuthStatuses: &[]models.AuthStatus{AuthStatus[2]},
 		Wallets:      &[]models.Wallet{Wallet[2]},
 	},
-	{Login: "taxes", Password: "taxesPassword",
+	{Login: "taxes", Password: pswdHashed,
 		ESingnatureId: &ESignature[3], UserAccaunt: &UserAccaunt[3],
 		AuthStatuses: &[]models.AuthStatus{AuthStatus[3]},
 		Wallets:      &[]models.Wallet{Wallet[3]},
