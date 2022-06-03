@@ -1,30 +1,33 @@
 package authHandler
 
 import (
+	"awesomeProject/pkg/logging"
 	"awesomeProject/pkg/models"
 	"awesomeProject/pkg/utils"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"net/http"
 )
 
 func (h authHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+	logger := logging.GetLogger()
 	credentials := &Credentials{}
 
 	err := json.NewDecoder(r.Body).Decode(&credentials)
 
 	if err != nil {
+		logger.Error("Can not decode credentials from request body")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Get the expected password from our in memory map
+	logger.Debugf("Try to find user %s in database", credentials.Login)
 	user := &models.User{}
 	userNotFound := user.IsUserByLogin(credentials.Login, h.DB)
 
-	if userNotFound == nil && errors.Is(userNotFound, gorm.ErrRecordNotFound) {
+	if userNotFound == nil {
+		logger.Warnf("User %s is already exists", credentials.Login)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -32,6 +35,7 @@ func (h authHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	hashedPass, err := utils.HashPassword(credentials.Password)
 
 	if err != nil {
+		logger.Infof("Can hash password for user %s", credentials.Login)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -45,6 +49,7 @@ func (h authHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, refreshString, err := createToken(credentials.Login, 15)
 	if err != nil {
+		logger.Errorf("Can't create token for %s", credentials.Login)
 		// If there is an error in creating the JWT return an internal server error
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -61,6 +66,7 @@ func (h authHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	refreshToken.Add(h.DB)
 
+	logger.Infof("Successfull signup and authorization for %s", credentials.Login)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&Token{Token: authLine, Login: credentials.Login})
 }

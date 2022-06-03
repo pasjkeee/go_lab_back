@@ -1,6 +1,7 @@
 package authHandler
 
 import (
+	"awesomeProject/pkg/logging"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -16,10 +17,12 @@ type Claims struct {
 }
 
 func (claims *Claims) Create(time time.Time, login string) {
+	logger := logging.GetLogger()
 	claims.Login = login
 	claims.StandardClaims = jwt.StandardClaims{
 		ExpiresAt: time.Unix(),
 	}
+	logger.Infof("Token created for %s", login)
 }
 
 type Token struct {

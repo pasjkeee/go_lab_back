@@ -1,10 +1,12 @@
 package main
 
 import (
+	"awesomeProject/pkg/config"
 	"awesomeProject/pkg/db"
 	"awesomeProject/pkg/handlers/authHandler"
 	"awesomeProject/pkg/handlers/userHandler"
 	"awesomeProject/pkg/handlers/walletHandler"
+	"awesomeProject/pkg/logging"
 	"awesomeProject/pkg/middleware"
 	"awesomeProject/pkg/socket"
 	"github.com/gorilla/mux"
@@ -19,7 +21,14 @@ func main() {
 	//	panic("usage go run main.go [dbUser] [dbPswd] [dbName]")
 	//}
 
-	DB := db.Init()
+	logging.Init()
+	logger := logging.GetLogger()
+	logger.Println("logger initialized")
+
+	logger.Println("config initializing")
+	cfg := config.GetConfig()
+
+	DB := db.Init(cfg)
 
 	router := mux.NewRouter()
 	userH := userHandler.New(DB)
